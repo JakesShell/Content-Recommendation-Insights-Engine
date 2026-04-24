@@ -1,63 +1,111 @@
 import pandas as pd
-from surprise import Dataset, Reader, SVD
-from surprise.model_selection import train_test_split
-from surprise import accuracy
+import numpy as np
 
-# Load the MovieLens dataset
-ratings = pd.read_csv('ml-latest-small/ratings.csv')
-movies = pd.read_csv('ml-latest-small/movies.csv')
+content_catalog = pd.DataFrame([
+    {"content_id": 1, "title": "City Heat", "Action": 1, "Drama": 0, "Comedy": 0, "Documentary": 0, "SciFi": 0, "Family": 0},
+    {"content_id": 2, "title": "Quiet Harbor", "Action": 0, "Drama": 1, "Comedy": 0, "Documentary": 0, "SciFi": 0, "Family": 0},
+    {"content_id": 3, "title": "Office Sparks", "Action": 0, "Drama": 0, "Comedy": 1, "Documentary": 0, "SciFi": 0, "Family": 0},
+    {"content_id": 4, "title": "Planet Signal", "Action": 0, "Drama": 0, "Comedy": 0, "Documentary": 0, "SciFi": 1, "Family": 0},
+    {"content_id": 5, "title": "Nature Code", "Action": 0, "Drama": 0, "Comedy": 0, "Documentary": 1, "SciFi": 0, "Family": 0},
+    {"content_id": 6, "title": "Weekend Heroes", "Action": 1, "Drama": 0, "Comedy": 1, "Documentary": 0, "SciFi": 0, "Family": 0},
+    {"content_id": 7, "title": "Signal Home", "Action": 0, "Drama": 1, "Comedy": 0, "Documentary": 0, "SciFi": 1, "Family": 0},
+    {"content_id": 8, "title": "Family Trail", "Action": 0, "Drama": 0, "Comedy": 0, "Documentary": 0, "SciFi": 0, "Family": 1},
+    {"content_id": 9, "title": "Market Minds", "Action": 0, "Drama": 0, "Comedy": 0, "Documentary": 1, "SciFi": 0, "Family": 0},
+    {"content_id": 10, "title": "Laugh Circuit", "Action": 0, "Drama": 0, "Comedy": 1, "Documentary": 0, "SciFi": 1, "Family": 0}
+])
 
-# Display the first few rows of the ratings
-print(ratings.head())
-print(movies.head())
+user_ratings = pd.DataFrame([
+    {"user_id": 101, "content_id": 1, "rating": 4.5},
+    {"user_id": 101, "content_id": 4, "rating": 5.0},
+    {"user_id": 101, "content_id": 7, "rating": 4.0},
+    {"user_id": 102, "content_id": 2, "rating": 4.5},
+    {"user_id": 102, "content_id": 5, "rating": 4.0},
+    {"user_id": 102, "content_id": 9, "rating": 4.5},
+    {"user_id": 103, "content_id": 3, "rating": 4.0},
+    {"user_id": 103, "content_id": 6, "rating": 4.5},
+    {"user_id": 103, "content_id": 10, "rating": 4.0},
+    {"user_id": 104, "content_id": 8, "rating": 5.0},
+    {"user_id": 104, "content_id": 2, "rating": 3.5},
+    {"user_id": 104, "content_id": 5, "rating": 4.0}
+])
 
-# Prepare the data for Surprise
-reader = Reader(rating_scale=(0.5, 5.0))
-data = Dataset.load_from_df(ratings[['userId', 'movieId', 'rating']], reader)
+feature_columns = ["Action", "Drama", "Comedy", "Documentary", "SciFi", "Family"]
 
-# Split the dataset into training and testing sets
-trainset, testset = train_test_split(data, test_size=0.2)
 
-# Build the collaborative filtering model using SVD
-model = SVD()
-model.fit(trainset)
+def build_user_profile(user_id):
+    history = user_ratings[user_ratings["user_id"] == user_id]
 
-# Make predictions on the test set
-predictions = model.test(testset)
+    if history.empty:
+        return None, None
 
-# Calculate and print RMSE
-rmse = accuracy.rmse(predictions)
-print(f'RMSE: {rmse}')
+    merged = history.merge(content_catalog, on="content_id", how="left")
+    weighted_matrix = merged[feature_columns].multiply(merged["rating"], axis=0)
+    profile = weighted_matrix.sum() / merged["rating"].sum()
 
-# Function to get movie recommendations
-def get_recommendations(user_id, num_recommendations=5):
-    movie_ids = ratings['movieId'].unique()
-    user_ratings = ratings[ratings['userId'] == user_id]['movieId'].tolist()
-    all_movie_ids = set(movie_ids) - set(user_ratings)
-    
-    # Predict ratings for all movies the user hasn't seen
-    recommendations = []
-    for movie_id in all_movie_ids:
-        pred_rating = model.predict(user_id, movie_id).est
-        recommendations.append((movie_id, pred_rating))
-    
-    # Sort recommendations by predicted rating
-    recommendations.sort(key=lambda x: x[1], reverse=True)
-    
-    # Get top N recommendations
-    top_recommendations = recommendations[:num_recommendations]
-    
-    # Return movie titles along with predicted ratings
-    recommended_movies = []
-    for movie_id, rating in top_recommendations:
-        title = movies[movies['movieId'] == movie_id]['title'].values[0]
-        recommended_movies.append((title, rating))
-    
-    return recommended_movies
+    return merged, profile
 
-# Example usage
-user_id = 1  # Change this to any user ID in the dataset
-recommendations = get_recommendations(user_id)
-print(f"Recommendations for User {user_id}:")
-for title, rating in recommendations:
-    print(f"{title} - Predicted Rating: {rating:.2f}")
+
+def get_recommendations(user_id, top_n=5):
+    watched, profile = build_user_profile(user_id)
+
+    if watched is None:
+        return None, None, None
+
+    watched_ids = set(watched["content_id"].tolist())
+    unseen = content_catalog[~content_catalog["content_id"].isin(watched_ids)].copy()
+
+    unseen["recommendation_score"] = unseen[feature_columns].dot(profile.values)
+    unseen = unseen.sort_values(by="recommendation_score", ascending=False).head(top_n)
+
+    return watched, profile, unseen[["title", "recommendation_score"]]
+
+
+def print_available_users():
+    ids = sorted(user_ratings["user_id"].unique().tolist())
+    print("Available Sample Users:", ", ".join(str(x) for x in ids))
+
+
+def main():
+    print("Content Recommendation Insights Engine")
+    print("Sample recommendation workflow for catalog and content teams")
+    print()
+
+    print_available_users()
+    print()
+
+    try:
+        user_id = int(input("Enter a user ID: ").strip())
+    except ValueError:
+        print("Invalid user ID. Please enter a number.")
+        return
+
+    watched, profile, recommendations = get_recommendations(user_id)
+
+    if watched is None:
+        print("User not found in the sample dataset.")
+        return
+
+    print()
+    print(f"Viewing recommendation profile for User {user_id}")
+    print()
+
+    print("Previously Rated Content")
+    print(watched[["title", "rating"]].to_string(index=False))
+    print()
+
+    profile_summary = pd.DataFrame({
+        "Preference Area": feature_columns,
+        "Score": np.round(profile.values, 3)
+    }).sort_values(by="Score", ascending=False)
+
+    print("Preference Summary")
+    print(profile_summary.to_string(index=False))
+    print()
+
+    print("Top Recommendations")
+    recommendations["recommendation_score"] = recommendations["recommendation_score"].round(3)
+    print(recommendations.to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()

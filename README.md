@@ -1,19 +1,56 @@
-# Movie Recommendation System
+﻿# Content Recommendation Insights Engine
 
 ## Overview
 
-The **Movie Recommendation System** is a Python application that provides personalized movie recommendations to users based on their previous ratings. By leveraging collaborative filtering techniques, specifically Singular Value Decomposition (SVD), this system predicts user preferences and suggests movies they are likely to enjoy.
+Content Recommendation Insights Engine is a Python-based recommendation prototype for generating personalized content suggestions from lightweight rating history and category preferences.
 
-## Features
+This project is positioned as a recruiter-ready analytics and recommendation portfolio piece. It upgrades a rough movie recommendation concept into a cleaner internal-tool style workflow that demonstrates how teams could explore content personalization logic without relying on heavy infrastructure.
 
-- **Collaborative Filtering**: Utilizes user-item interactions to recommend movies based on similar users' preferences.
-- **MovieLens Dataset**: Implements the MovieLens dataset, a widely used resource for movie recommendations.
-- **User-Friendly**: Allows users to input their ID to receive personalized movie suggestions.
-- **Performance Metrics**: Evaluates the model's accuracy using Root Mean Squared Error (RMSE).
+## Real-World Business Use Case
 
-## Technologies Used
+This project maps to practical workflows used by:
 
-- **Python**: The programming language used for implementation.
-- **Pandas**: For data manipulation and analysis.
-- **Surprise**: A Python library specifically designed for building and analyzing recommender systems.
-- **NumPy**: For numerical operations.
+- Streaming And Media Teams
+- Content Operations Teams
+- Product Analysts
+- Personalization Prototyping Workflows
+- Internal Recommendation Experiments
+
+A team may need to answer questions such as:
+
+- Which unseen content items best match a user's prior preferences?
+- How can recommendation logic be prototyped quickly?
+- How can category affinity be summarized for internal review?
+- How can a recommendation concept be shown clearly in a lightweight Python tool?
+
+This kind of tool is useful for prototyping recommendation logic, internal experiments, and portfolio demonstration of analytics-oriented product thinking.
+
+## Key Features
+
+- Sample User Rating History
+- Category-Based Preference Profiling
+- Ranked Content Recommendations
+- Preference Summary Output
+- Lightweight Console Workflow
+- No Heavy External Dataset Requirement
+
+## Tech Stack
+
+- Python
+- Pandas
+- NumPy
+
+## Repository Contents
+
+- `MovieAI.py`
+- `requirements.txt`
+- `README.md`
+- `.gitignore`
+
+## How To Run
+
+### 1. Create And Activate A Virtual Environment
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
