@@ -1,51 +1,63 @@
-﻿# Content Recommendation Insights Engine
+﻿# PulseCue AI Content Recommendation And Engagement Console
 
 ## Overview
 
-Content Recommendation Insights Engine is a Python-based recommendation prototype for generating personalized content suggestions from lightweight rating history and category preferences.
+PulseCue is an enterprise-style AI content recommendation and audience engagement console. It upgrades the original lightweight Python recommendation prototype into a product-ready internal platform concept for content, media, education, SaaS, and growth teams.
 
-This project is positioned as a recruiter-ready analytics and recommendation portfolio piece. It upgrades a rough movie recommendation concept into a cleaner internal-tool style workflow that demonstrates how teams could explore content personalization logic without relying on heavy infrastructure.
+The dashboard helps teams decide which content should be recommended next, why it matches an audience, what engagement lift it may create, and how recommendations could move into a cloud publishing workflow.
 
 ## Real-World Business Use Case
 
-This project maps to practical workflows used by:
+Content teams often have too much content and not enough clarity. PulseCue helps answer:
 
-- Streaming And Media Teams
-- Content Operations Teams
-- Product Analysts
-- Personalization Prototyping Workflows
-- Internal Recommendation Experiments
+- What should each audience segment see next?
+- Which recommendation has the strongest fit?
+- Why did the system recommend this content?
+- Which content supports retention, activation, growth, or trust?
+- What should move into the cloud publishing queue?
 
-A team may need to answer questions such as:
-
-- Which unseen content items best match a user's prior preferences?
-- How can recommendation logic be prototyped quickly?
-- How can category affinity be summarized for internal review?
-- How can a recommendation concept be shown clearly in a lightweight Python tool?
-
-This kind of tool is useful for prototyping recommendation logic, internal experiments, and portfolio demonstration of analytics-oriented product thinking.
+This type of system maps to workflows used by streaming platforms, online learning libraries, customer education teams, internal enablement teams, and SaaS content operations teams.
 
 ## Key Features
 
-- Sample User Rating History
-- Category-Based Preference Profiling
-- Ranked Content Recommendations
-- Preference Summary Output
-- Lightweight Console Workflow
-- No Heavy External Dataset Requirement
+- AI-style recommendation dashboard
+- Audience profile selector
+- Business goal selector for retention, activation, growth, and trust
+- Ranked next-best content recommendations
+- Explainable “why this was recommended” logic
+- Audience taste map
+- Engagement lift forecast
+- Recommendation strategy brief
+- Content cluster health
+- Recent audience history
+- Cloud + AI publishing pipeline
+- CSV export endpoint
+- Synthetic customer review section for product storytelling
+- Light and dark mode
 
 ## Tech Stack
 
 - Python
+- Flask
 - Pandas
 - NumPy
+- HTML
+- CSS
+- JavaScript
 
-## Repository Contents
+## Cloud + AI Direction
 
-- `MovieAI.py`
-- `requirements.txt`
-- `README.md`
-- `.gitignore`
+PulseCue models how a cloud-ready recommendation workflow could operate:
+
+1. Audience signals enter through an API layer.
+2. Recommendation logic scores the content catalog.
+3. AI-generated explanations help humans understand the recommendation.
+4. Approved recommendations move into a cloud publishing queue.
+5. Product, email, learning, and streaming surfaces receive the next-best content.
+
+## Safe Demo Boundary
+
+This project uses synthetic sample data only. It does not collect real user behavior, connect to external customer systems, or claim production-level AI personalization. It is a portfolio-ready simulation of recommendation intelligence workflows.
 
 ## How To Run
 
@@ -54,3 +66,18 @@ This kind of tool is useful for prototyping recommendation logic, internal exper
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
+## Screenshot Gallery
+
+### Dashboard Overview
+![PulseCue Dashboard Overview](screenshots/pulsecue-dashboard-overview.png)
+
+### Recommendation Queue
+![PulseCue Recommendation Queue](screenshots/pulsecue-recommendation-queue.png)
+
+### Cloud Pipeline CTA
+![PulseCue Cloud Pipeline CTA](screenshots/pulsecue-cloud-pipeline-cta.png)
+
+## Final Project Name
+
+PulseCue AI Content Recommendation And Engagement Console

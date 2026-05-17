@@ -1,0 +1,383 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseCue AI Content Recommendation Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <div class="grain"></div>
+
+    <main class="shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">PC</div>
+                <div>
+                    <span>PulseCue Intelligence Lab</span>
+                    <strong>AI Content Recommendation Console</strong>
+                </div>
+            </div>
+
+            <nav>
+                <a href="#signal-room">Signal Room</a>
+                <a href="#recommendations">Recommendations</a>
+                <a href="#audience">Audience</a>
+                <a href="#cloud">Cloud Pipeline</a>
+            </nav>
+
+            <button class="mode-toggle" id="modeToggle" type="button">Light Mode</button>
+        </header>
+
+        <section class="hero" id="signal-room">
+            <div class="hero-copy">
+                <p class="eyebrow">Audience Signal Forecasting Platform</p>
+                <h1>Know what every audience should see next before they drift away.</h1>
+                <p class="hero-subtext">
+                    PulseCue turns ratings, completion signals, catalog metadata, and content goals into explainable AI recommendations for content, product, learning, and growth teams.
+                </p>
+
+                <form class="control-panel" id="recommendationForm">
+                    <label>
+                        Audience Profile
+                        <select id="audienceSelect">
+                            {% for audience in audiences %}
+                            <option value="{{ audience.user_id }}" {% if audience.user_id == initial.audience.user_id %}selected{% endif %}>
+                                {{ audience.name }} · {{ audience.segment }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <label>
+                        Business Goal
+                        <select id="goalSelect">
+                            <option value="retention" selected>Retention</option>
+                            <option value="activation">Activation</option>
+                            <option value="growth">Growth</option>
+                            <option value="trust">Trust</option>
+                        </select>
+                    </label>
+
+                    <button type="submit">Generate Recommendation Plan</button>
+                </form>
+            </div>
+
+            <div class="ai-orbit-card">
+                <div class="orbit-stage">
+                    <div class="orbit-ring ring-one"></div>
+                    <div class="orbit-ring ring-two"></div>
+                    <div class="orbit-ring ring-three"></div>
+
+                    <div class="content-node node-one">Video</div>
+                    <div class="content-node node-two">Guide</div>
+                    <div class="content-node node-three">Course</div>
+                    <div class="content-node node-four">Brief</div>
+
+                    <div class="ai-core">
+                        <span>AI</span>
+                        <strong id="heroFit">{{ initial.metrics.audience_fit }}%</strong>
+                    </div>
+                </div>
+
+                <div class="ai-card-footer">
+                    <p>Recommendation Health</p>
+                    <h2 id="heroRecommendation">{{ initial.ai_brief.headline }}</h2>
+                    <span id="heroSegment">{{ initial.audience.name }} · {{ initial.audience.segment }}</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA HERO: SIGNAL ROOM -->
+        <section class="bottom-hero-cta signal-cta">
+            <div>
+                <p class="eyebrow">Signal Room Action</p>
+                <h2>Turn audience behavior into a recommendation plan.</h2>
+                <p>Choose an audience, select the business goal, and let PulseCue generate the next-best content queue with explainable reasoning.</p>
+            </div>
+            <div class="cta-actions">
+                <button type="button" class="cta-primary" data-action="generate-plan">Generate Plan</button>
+                <a href="#recommendations" class="cta-secondary">View Recommendations</a>
+            </div>
+        </section>
+        <!-- END CTA HERO -->
+
+        <section class="metric-grid">
+            <article>
+                <span>Audience Fit</span>
+                <strong id="metricFit">{{ initial.metrics.audience_fit }}%</strong>
+                <p>Top recommendation match</p>
+            </article>
+
+            <article>
+                <span>Forecast Lift</span>
+                <strong id="metricLift">{{ initial.metrics.forecast_lift }}</strong>
+                <p>Estimated engagement lift points</p>
+            </article>
+
+            <article>
+                <span>Recommended Items</span>
+                <strong id="metricItems">{{ initial.metrics.recommended_items }}</strong>
+                <p>Ranked content actions</p>
+            </article>
+
+            <article>
+                <span>Retention Risk</span>
+                <strong id="metricRisk">{{ initial.metrics.retention_risk }}</strong>
+                <p>Based on audience fit</p>
+            </article>
+        </section>
+
+        <section class="split-section">
+            <article class="brief-card">
+                <p class="eyebrow">AI Strategy Brief</p>
+                <h2 id="briefHeadline">{{ initial.ai_brief.headline }}</h2>
+                <p id="briefSummary">{{ initial.ai_brief.summary }}</p>
+
+                <ol id="briefSteps">
+                    {% for step in initial.ai_brief.next_steps %}
+                    <li>{{ step }}</li>
+                    {% endfor %}
+                </ol>
+            </article>
+
+            <article class="taste-card" id="audience">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Audience Taste Map</p>
+                        <h2>Preference signals</h2>
+                    </div>
+                    <span id="profileStrength">{{ initial.metrics.profile_strength }}% strongest signal</span>
+                </div>
+
+                <div id="tasteBars" class="taste-bars">
+                    {% for signal in initial.profile %}
+                    <div class="taste-row">
+                        <span>{{ signal.signal }}</span>
+                        <i style="--w: {{ signal.score }}%"></i>
+                        <strong>{{ signal.score }}%</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <section class="recommendation-section" id="recommendations">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Ranked Recommendation Queue</p>
+                    <h2>Next-best content actions</h2>
+                </div>
+
+                <a class="export-link" id="exportLink" href="/api/export?user_id={{ initial.audience.user_id }}&goal=retention">Export CSV</a>
+            </div>
+
+            <div class="recommendation-grid" id="recommendationGrid">
+                {% for item in initial.recommendations %}
+                <article class="recommendation-card">
+                    <div class="card-topline">
+                        <span>{{ item.priority }}</span>
+                        <b>{{ "%.1f"|format(item.recommendation_score) }}%</b>
+                    </div>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.summary }}</p>
+                    <div class="card-tags">
+                        <span>{{ item.content_type }}</span>
+                        <span>{{ item.channel }}</span>
+                        <span>{{ item.cloud_ready_status }}</span>
+                    </div>
+                    <div class="why-box">
+                        <strong>Why PulseCue recommends it</strong>
+                        <ul>
+                            {% for reason in item.why %}
+                            <li>{{ reason }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- CTA HERO: RECOMMENDATIONS -->
+        <section class="bottom-hero-cta recommendation-cta">
+            <div>
+                <p class="eyebrow">Recommendation Queue Action</p>
+                <h2>Move the strongest content into a campaign-ready queue.</h2>
+                <p>Use the ranked list to decide what should be promoted first, what needs human review, and what can move into cloud publishing.</p>
+            </div>
+            <div class="cta-actions">
+                <a href="#cloud" class="cta-primary">Send To Cloud Pipeline</a>
+                <a id="ctaExportLink" href="/api/export?user_id={{ initial.audience.user_id }}&goal=retention" class="cta-secondary">Export Recommendation CSV</a>
+            </div>
+        </section>
+        <!-- END CTA HERO -->
+
+        <section class="split-section audience-insights-section">
+            <article class="history-card">
+                <p class="eyebrow">Recent Audience History</p>
+                <h2>What this audience already liked</h2>
+                <div id="historyList" class="history-list">
+                    {% for item in initial.watched %}
+                    <div>
+                        <strong>{{ item.title }}</strong>
+                        <span>{{ item.content_type }} · Rating {{ item.rating }} · {{ item.completion }}% complete</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </article>
+
+            <article class="cluster-card">
+                <p class="eyebrow">Content Cluster Health</p>
+                <h2>Library signal groups</h2>
+                <div id="clusterList" class="cluster-list">
+                    {% for cluster in initial.clusters[:5] %}
+                    <div>
+                        <span>{{ cluster.name }}</span>
+                        <strong>{{ cluster.signal }}%</strong>
+                        <small>{{ cluster.items }} items · {{ cluster.avg_engagement }} avg engagement</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </article>
+        </section>
+
+        <!-- CTA HERO: AUDIENCE -->
+        <section class="bottom-hero-cta audience-cta">
+            <div>
+                <p class="eyebrow">Audience Intelligence Action</p>
+                <h2>Use taste signals to personalize the next content journey.</h2>
+                <p>The audience map shows what this profile already responds to, so teams can recommend content with context instead of guessing.</p>
+            </div>
+            <div class="cta-actions">
+                <a href="#recommendations" class="cta-primary">Review Next-Best Content</a>
+                <button type="button" class="cta-secondary" data-action="switch-audience">Try Another Audience</button>
+            </div>
+        </section>
+        <!-- END CTA HERO -->
+
+        <section class="cloud-section" id="cloud">
+            <div>
+                <p class="eyebrow">Cloud + AI Workflow</p>
+                <h2>Recommendation publishing pipeline</h2>
+                <p>
+                    PulseCue models how a cloud-ready content platform could receive audience events, score catalog items, prepare AI-assisted explanations, and route approved recommendations into product, email, learning, or streaming surfaces.
+                </p>
+            </div>
+
+            <div class="pipeline">
+                <article>
+                    <b>1</b>
+                    <strong>Audience Signal API</strong>
+                    <span>Ratings, completion, clicks, and segment intent enter the scoring layer.</span>
+                </article>
+
+                <article>
+                    <b>2</b>
+                    <strong>AI Recommendation Engine</strong>
+                    <span>Affinity, engagement, freshness, cost, and business goal signals are combined.</span>
+                </article>
+
+                <article>
+                    <b>3</b>
+                    <strong>Human Review Gate</strong>
+                    <span>Teams approve sensitive, strategic, or high-impact recommendations.</span>
+                </article>
+
+                <article>
+                    <b>4</b>
+                    <strong>Cloud Publishing Queue</strong>
+                    <span>Approved content is ready for API delivery, campaign export, or product placement.</span>
+                </article>
+            </div>
+        </section>
+
+        <!-- CTA HERO: CLOUD PIPELINE -->
+        <section class="bottom-hero-cta cloud-cta">
+            <div>
+                <p class="eyebrow">Cloud Publishing Action</p>
+                <h2>Prepare approved recommendations for delivery.</h2>
+                <p>In a production environment, this workflow could connect to a content API, email system, learning platform, or streaming surface.</p>
+            </div>
+            <div class="cta-actions">
+                <a href="#signal-room" class="cta-primary">Generate Another Plan</a>
+                <a href="#recommendations" class="cta-secondary">Review Queue Again</a>
+            </div>
+        </section>
+        <!-- END CTA HERO -->
+
+        <section class="customer-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Customer Satisfaction Lab</p>
+                    <h2>Sample reviews from teams using PulseCue-style workflows</h2>
+                    <p>Generated demo personas and comments for portfolio storytelling.</p>
+                </div>
+                <div class="rating-block">
+                    <strong>4.8/5</strong>
+                    <span>★★★★★ 96 scenario reviews</span>
+                </div>
+            </div>
+
+            <div class="review-grid">
+                <article>
+                    <div class="avatar avatar-one">MC</div>
+                    <h3>Maya Chen</h3>
+                    <span>Product Lead · StreamWave</span>
+                    <b>★★★★★</b>
+                    <p>“PulseCue helped our team explain why each recommendation mattered instead of just showing a black-box score.”</p>
+                </article>
+
+                <article>
+                    <div class="avatar avatar-two">AR</div>
+                    <h3>Alex Ramos</h3>
+                    <span>Growth Director · LearnStack</span>
+                    <b>★★★★★</b>
+                    <p>“The content queue made our next campaign obvious. Less guessing, more confident decisions.”</p>
+                </article>
+
+                <article>
+                    <div class="avatar avatar-three">NK</div>
+                    <h3>Nia Kapoor</h3>
+                    <span>Security Enablement · CloudForge</span>
+                    <b>★★★★★</b>
+                    <p>“The cloud pipeline view made this feel operational, not just analytical.”</p>
+                </article>
+            </div>
+        </section>
+
+
+        <!-- CTA HERO: FINAL -->
+        <section class="final-product-cta">
+            <div class="final-cta-orb">
+                <span>AI</span>
+                <strong>Ready</strong>
+            </div>
+            <div>
+                <p class="eyebrow">Executive Launch CTA</p>
+                <h2>PulseCue turns content libraries into guided engagement decisions.</h2>
+                <p>Portfolio demo ready for product, cloud, AI, and content operations storytelling.</p>
+            </div>
+            <div class="cta-actions">
+                <a href="#signal-room" class="cta-primary">Run Another Forecast</a>
+                <a href="#cloud" class="cta-secondary">View Cloud Workflow</a>
+            </div>
+        </section>
+        <!-- END CTA HERO -->
+
+        <footer>
+            <span>PulseCue · Portfolio Demo</span>
+            <span>Safe synthetic data only</span>
+            <span>Cloud + AI recommendation workflow</span>
+            <span>{{ current_year }}</span>
+        </footer>
+    </main>
+
+    <script>
+        window.__INITIAL_DATA__ = {{ initial|tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
